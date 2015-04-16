@@ -5,14 +5,15 @@
 
 <?php
 /*
-	$session = \Core\Session\Session::getInstance();
-	\Core\Debug\Dump::getInstance($session->toArray());
 	\Core\Debug\Dump::getInstance($session->get('test'));
 	\Core\Debug\Dump::getInstance($session->get('whatever'));
 	*/
+	
 	\Core\Session\Session::getInstance()->set('USER_ID', 138);
+	//\Core\Debug\Dump::getInstance(\Core\Application::getInstance()->getConfigs()->get()); die;
 	$u = \Core\Hybernate\Users\Users::getUser();
 	var_dump($u->get());
-	$u->logout();
+	//$u->logout();
 	echo 'Donw..';
+	\Core\Debug\Dump::getInstance(\Core\Session\Session::getInstance()->toArray());
 //	var_dump(get_class($session));

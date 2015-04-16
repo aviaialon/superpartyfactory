@@ -29,18 +29,20 @@ class Users extends \Core\Interfaces\HybernateInterface
 	/**
 	 * This method logs the user out of the system
 	 *
+	 * @param  boolean $redirect Redirect the user after logout
 	 * @return void
 	 */
-	public final function logout()
+	public final function logout($redirect = true)
 	{
 		
 		//var_dump(array('it' => $this->_objectInterfaceType));
 		/* @var $session \Core\Session\Session */
 		
 		if ($this->getId() > 0) {
-			$session 	= \Core\Session\Session::getInstance();
-			$lang		= $session->get('lang') | 'en';
-			$loginDate	= $session->get('USER_LOGIN_DATE') | (time() - 120);
+			$Application = \Core\Application::getInstance();
+			$session 	 = \Core\Session\Session::getInstance();
+			$lang		 = $session->get('lang') | 'en';
+			$loginDate	 = $session->get('USER_LOGIN_DATE') | (time() - 120);
 			$this->_dataAccessInterface->execute(sprintf(
 				'UPDATE %s SET time_spent_last_login = UNIX_TIMESTAMP(NOW()) - %s WHERE id = ?', $this->_objectInterfaceType, $loginDate), array($this->getId()));
 			
@@ -48,13 +50,11 @@ class Users extends \Core\Interfaces\HybernateInterface
 			$session->getSession();
 			$session->set('lang', $lang);
 			
-			
-			/*
-			if ($blnRedirect) {
-				SESSION::set('info', $this->Application->translate('You have successfully logged out of the system.', 'Vous avez réussi à vous connecter sur le système.'));
-				URL::redirect($_SERVER['PHP_SELF']);
+			if (true === $redirect) {
+				$session->set('info', $Application->translate('You have successfully logged out of the system.', 'Vous avez réussi à vous connecter sur le système.'));
+				\Core\Net\Url::redirect($Application->getConfigs()->get('Application.core.base_url'));
+				exit;
 			}
-			*/
 		}
 	}
 }

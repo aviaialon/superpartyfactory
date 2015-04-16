@@ -127,7 +127,7 @@ class Session /* implements SessionHandlerInterface */
 			register_shutdown_function('session_write_close');
 			session_name($configs->get('Application.core.session.name'));
 			session_cache_expire(((int) $configs->get('Application.core.session.expiration_seconds')) / 60);
-			session_start();	
+			@session_start();	
 		}
     }
 	
@@ -197,8 +197,25 @@ class Session /* implements SessionHandlerInterface */
      */
     public function destroy($id) 
 	{
+		unset($_SESSION);
+		session_unset();
+		session_destroy();	
+		
         $sql = "DELETE FROM sessions WHERE  id = ?";
+		
 		return self::getDbo()->execute($sql, array($id));
+    }
+	
+	/**
+     * resets the current session
+     *
+     * @param  string $id 	The session id
+     * @access public
+     * @return Mixed
+     */
+    public function reset() 
+	{
+		return $this->destroy($this->getId());
     }
 	
 	/**
@@ -349,24 +366,9 @@ class Session /* implements SessionHandlerInterface */
 	public static function getSession() 
 	{
 		$strSessionClassName = __CLASS__;
-		$objSession = new $strSessionClassName();	
-		return ($objSession);
-	}
-	
-	/**
-     * Deletes and clears the current session
-     *
-     * @access public
-     * @return void
-     */
-	public static function reset() 
-	{
-		$objSession = self::getSession();
-		$objSession->destroy(session_id());
+		$objSession          = new $strSessionClassName();	
 		
-		unset($_SESSION);
-		session_unset();
-		session_destroy();	
+		return ($objSession);
 	}
 	
 	/**
