@@ -108,7 +108,7 @@ class Css
 	 * @access 	public, final
 	 * @return 	CSS_MINIFICATION
 	 */
-	public static final function getInstance()
+	public static final function getInstance($strProcessorClassName = \Core\Util\Minification\Minification::Minification_Processor_Css)
 	{
 		return (new self());
 	}
@@ -146,6 +146,28 @@ class Css
  * @author Stephen Clay <steve@mrclay.org>
  */
 class Minify_CSS {
+	
+    /**
+     * @var bool Are we "in" a hack?
+     *
+     * I.e. are some browsers targetted until the next comment?
+     */
+    protected static $_inHack = false;
+
+    /**
+     * @var string string to be prepended to relative URIs
+     */
+    protected static $_tempPrepend = '';
+
+    /**
+     * @var string string to be prepended to absolute URIs
+     */
+    protected static $_tempPrependAbsolute = '';
+
+    /**
+     * @var string directory of this stylesheet for rewriting purposes
+     */
+    protected static $_tempCurrentDir = '';
 
     /**
      * Minify a CSS string
@@ -178,7 +200,7 @@ class Minify_CSS {
         //require_once 'Minify/CommentPreserver.php';
         // recursive calls don't preserve comments
         $options['preserveComments'] = false;
-		
+
         return Minify_CommentPreserver::process(
             $css
             ,array('\\Core\\Util\\Minification\\Processors\\Minify_CSS', 'minify')
@@ -243,6 +265,7 @@ class Minify_CSS {
             /x', '$1$2:$3', $css);
 
         // remove ws in selectors
+		/*
         $css = preg_replace_callback('/
                 (?:              # non-capture
                     \\s*
@@ -255,11 +278,12 @@ class Minify_CSS {
                 {                # open declaration block
             /x'
             ,array('\\Core\\Util\\Minification\\Processors\\Minify_CSS', '_selectorsCB'), $css);
+			*/
 
         // minimize hex colors
         $css = preg_replace('/([^=])#([a-f\\d])\\2([a-f\\d])\\3([a-f\\d])\\4([\\s;\\}])/i'
             , '$1#$2$3$4$5', $css);
-
+			
         // remove spaces between font families
         $css = preg_replace_callback('/font-family:([^;}]+)([;}])/'
             ,array('\\Core\\Util\\Minification\\Processors\\Minify_CSS', '_fontFamilyCB'), $css);
@@ -322,28 +346,6 @@ class Minify_CSS {
         // remove ws around the combinators
         return preg_replace('/\\s*([,>+~])\\s*/', '$1', $m[0]);
     }
-
-    /**
-     * @var bool Are we "in" a hack?
-     *
-     * I.e. are some browsers targetted until the next comment?
-     */
-    protected static $_inHack = false;
-
-    /**
-     * @var string string to be prepended to relative URIs
-     */
-    protected static $_tempPrepend = '';
-
-    /**
-     * @var string string to be prepended to absolute URIs
-     */
-    protected static $_tempPrependAbsolute = '';
-
-    /**
-     * @var string directory of this stylesheet for rewriting purposes
-     */
-    protected static $_tempCurrentDir = '';
 
     /**
      * Process a comment and return a replacement
@@ -549,12 +551,12 @@ class Minify_CommentPreserver {
     public static function process($content, $processor, $args = array())
     {
         $ret = '';
-        while (true) {
+        while (true) { 
             list($beforeComment, $comment, $afterComment) = self::_nextComment($content);
             if ('' !== $beforeComment) {
-                $callArgs = $args;
+                $callArgs = $args; 
                 array_unshift($callArgs, $beforeComment);
-                $ret .= call_user_func_array($processor, $callArgs);    
+                $ret .= call_user_func_array($processor, $callArgs);   
             }
             if (false === $comment) {
                 break;

@@ -111,7 +111,8 @@ class Router
         $Application    = \Core\Application::getInstance();
         $configs        = $Application->getConfigs();
         $rawRequestData = array_merge($_GET, $dispatchRequestData, $_POST);
-        $mvcPath        = trim((empty($rawRequestData['path']) === false) ? $rawRequestData['path'] : $_SERVER['REQUEST_URI'], '/');
+		$defaultReqUri  = str_replace('?' . $_SERVER['QUERY_STRING'], '', $_SERVER['REQUEST_URI']);
+        $mvcPath        = trim((empty($rawRequestData['path']) === false) ? $rawRequestData['path'] : $defaultReqUri, '/');
         $mvcPath        = str_replace(trim($configs->get('Application.core.server_root'), '/'), '', trim($mvcPath, '/'));
 		$mvcUrl         = $mvcPath;
 
@@ -158,6 +159,7 @@ class Router
                                    DIRECTORY_SEPARATOR .(strtolower($controller) !== 'index' ? strtolower($controller) : '') . DIRECTORY_SEPARATOR .
                                    strtolower($action) . '.' . $configs->get('Application.core.mvc.view_ext'))
         ));
+		
         $this->setLayout($configs->get('Application.core.mvc.layout'));
 		$this->setContentType(\Core\Net\Router::Content_Type_Html);
 		

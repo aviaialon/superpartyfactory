@@ -54,6 +54,6 @@ class PartialDispatcher
 		$this->setPartialData($partialData);
         //echo $this->loadFileAsset($partialRoot, sprintf('Partial [%s] not found', $partialRoot));	
 		if (false === @include $partialRoot)
-                 $this->pageNotFound(sprintf('Partial [%s] not found', $partialRoot));
+                 throw new \Core\Exception(sprintf('Partial [%s] not found', $partialRoot));
     }
 }

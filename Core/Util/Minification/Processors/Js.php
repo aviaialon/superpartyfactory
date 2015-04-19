@@ -108,7 +108,7 @@ class Js
 	 * @access 	public, final
 	 * @return 	CSS_MINIFICATION
 	 */
-	public static final function getInstance()
+	public static function getInstance($strProcessorClassName = \Core\Util\Minification\Minification::Minification_Processor_Js)
 	{
 		return (new self());
 	}
