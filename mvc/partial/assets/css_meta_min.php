@@ -22,7 +22,7 @@
 	$Application->getConfigs()->get('Application.core.mvc.site.name'), 
 	$Application->getConfigs()->get('Application.core.mvc.site.title')); ?></title>
 <link rel="profile" href="http://gmpg.org/xfn/11">
-<link rel="shortcut icon" href="http://directory.chimpgroup.com/wp-content/themes/directory-theme/assets/images/favicon.png" />
+<link rel="shortcut icon" href="<?php echo $assetsBaseImg; ?>/favicon.png" />
 <link rel="stylesheet" id="main-css"  href="<?php echo $cssFileAsset; ?>" type="text/css" media="all" />
 <script type="text/javascript" src="//maps.googleapis.com/maps/api/js?language=en-CA&sensor=false&v=3.13&libraries=places"></script>
 <script type="text/javascript" src="//google-maps-utility-library-v3.googlecode.com/svn/trunk/markerclusterer/src/markerclusterer.js"></script>

@@ -2,6 +2,7 @@
     $Application   = \Core\Application::getInstance();
     $assetsBaseCcs = $Application->getConfigs()->get('Application.core.mvc.controller.assets.base.css');
 	$assetsBaseJs  = $Application->getConfigs()->get('Application.core.mvc.controller.assets.base.js');
+	$assetsBaseImg = $Application->getConfigs()->get('Application.core.mvc.controller.assets.base.img');
 	$cssFileAssets = array(
 		$assetsBaseCcs . "/theme.css",
 		$assetsBaseCcs . "/iconmoon.css",
@@ -23,7 +24,7 @@
 	$Application->getConfigs()->get('Application.core.mvc.site.name'), 
 	$Application->getConfigs()->get('Application.core.mvc.site.title')); ?></title>
 <link rel="profile" href="http://gmpg.org/xfn/11">
-<link rel="shortcut icon" href="http://directory.chimpgroup.com/wp-content/themes/directory-theme/assets/images/favicon.png" />
+<link rel="shortcut icon" href="<?php echo $assetsBaseImg; ?>/favicon.png" />
 <?php foreach ($cssFileAssets as $cssFileAsset) { ?>
 <link rel="stylesheet" id="<?php echo(md5($cssFileAsset)); ?>"  href="<?php echo $cssFileAsset; ?>" type="text/css" media="all" />
 <?php } ?>

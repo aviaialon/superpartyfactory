@@ -1,4 +1,6 @@
 <?php
+$Application   = \Core\Application::getInstance();
+$assetsBaseImg = $Application->getConfigs()->get('Application.core.mvc.controller.assets.base.img');
 $bootstrapData = array (
 	  'filters' => NULL,
 	  'pagination_footer' => '',
@@ -66,7 +68,7 @@ $mainCategories = \Core\Hybernate\Listings\Listing_Category::getParentCategories
               <li class="loc-section searchLocFrm">
                 <h6>Locations</h6>
                 <div class="location-icon __location" data-bind="#map_filter_location">
-                	<img src="http://directory.chimpgroup.com/wp-content/plugins/wp-directory/assets/images/maplocation.png" alt="" />
+                	<img src="<?php echo $assetsBaseImg; ?>/maplocation.png" alt="" />
                 </div>
                 <input type="search" value="" autocomplete="off" title="Location" placeholder="Your location or postal / zip code" name="location" id="map_filter_location" />
               </li>

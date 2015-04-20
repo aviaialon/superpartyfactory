@@ -276,3 +276,15 @@ ul.multiselect-container > li:first-child:before {
   box-shadow: 0px 0px 2px 0px #cdd0d3;
   border: none;
 }
+
+.bounce-animation {
+  -webkit-animation: bounce 1s forwards;
+  animation: bounce 1s forwards;
+}
+.map-marker:hover {
+  background-color: #0dcdbd;
+  cursor: pointer;
+}
+.map-marker:hover:before {
+  border-color: #0dcdbd transparent transparent transparent;
+}

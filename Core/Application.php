@@ -92,7 +92,7 @@ class Application
 
         // get the configs
         $this->setConfigs(\Core\Config\Configurations::getInstance());
-        $this->getConfigs()->set('Application.server.document_root', $_SERVER['DOCUMENT_ROOT']);
+        $this->getConfigs()->set('Application.server.document_root', $_SERVER['DOCUMENT_ROOT'] . getenv('BASE'));
         $this->getConfigs()->set('Application.core.core_path', preg_replace('/(\/[^\/.]+\/[\.]{2}\/)/', '/', realpath(dirname(__FILE__))));
         $this->getConfigs()->set('Application.core.document_root', preg_replace('/(\/[^\/.]+\/[\.]{2}\/)/', '/', str_replace('//', '/', $_SERVER['DOCUMENT_ROOT'] .
             (true === isset($_SERVER['BASE']) ? $_SERVER['BASE'] : dirname($_SERVER['SCRIPT_NAME'])))));
@@ -107,7 +107,7 @@ class Application
                 $this->getConfigs()->get('Application.core.mvc.application_path'))));
 				
         ini_set('display_errors', (int) $this->getConfigs()->get('Application.core.exception.display'));
-		
+
         return $this;
     }
 

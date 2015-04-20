@@ -721,10 +721,10 @@ padding: 3px 5px 2px; font-size: 11px; background-color: #fff7eb !important; col
 .price-loader { position: absolute; right: 20px; top: 10px; }
 .directory-advanced-search-content form ul li.submit-button { text-align: center; width: 6.25%; }
 .form-text, .form-select, .dr-search, .input-sec, .cs-range-input {width: 100%;}
-.directory-advanced-search-content form ul li .form-submit { background: #333232; border-radius: 3px; border: none; box-shadow: none; color: #ffffff; font-size: 16px; font-weight: bold; margin: 22px 0px 0px 0px; padding: 8px 5px 6px; text-shadow: inherit; text-transform: uppercase; width: 100%; }
+.directory-advanced-search-content form ul li .form-submit { background: #333232; border-radius: 0px; border: none; box-shadow: none; color: #ffffff; font-size: 16px; font-weight: bold; margin: 22px 0px 0px 0px; padding: 8px 5px 6px; text-shadow: inherit; text-transform: uppercase; width: 100%; }
 .cs-search-v2 .directory-advanced-search-content form ul li .form-submit { background-color: #333232 !important; margin-top: 0px; }
 .cs-search-v2 .directory-advanced-search-content form ul li .form-submit i { margin-right: 8px; font-size: 14px; }
-.cs-search-v1 .directory-advanced-search-content form ul li .form-submit { margin-top: 0px; }
+.cs-search-v1 .directory-advanced-search-content form ul li .form-submit { margin-top: 15px; }
 .cs-search-v1 .directory-advanced-search-content form ul li.submit-button { vertical-align: middle; }
 .directory-advanced-search-content h6 { text-transform: uppercase; }
 .directory-advanced-search-content form ul li input.form-text,

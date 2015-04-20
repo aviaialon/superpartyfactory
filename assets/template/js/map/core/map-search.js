@@ -1117,6 +1117,8 @@ eval(function (p, a, c, k, e, r) {
                 }
             }
             if (e.type === "dataNewSearchResultsLoaded") {
+				console.log('----------- CURRENT MARKERS ------------- 1120');
+				console.log(this.currentMarkers);
                 data.listingData.forEach(function (listing) {
                     if (this.currentMarkers[listing.id]) {
                         listing.isOldMarker = true
@@ -1137,22 +1139,35 @@ eval(function (p, a, c, k, e, r) {
                         }
                         mapBounds.extend(marker.getPosition())
                     }, this)
-                }
+                } else {
+					console.log('----------- CURRENT MARKERS ------------- 1120');
+					console.log(this.currentMarkers);	
+					data.listingData.forEach(function (listing) {
+						if (this.currentMarkers[listing.id]) {
+							listing.isOldMarker = true
+						}
+					}, this);
+				}
             }
 	    
             var infowindow = new google.maps.InfoWindow({ maxWidth: 420 });
 
             data.listingData.forEach(function (listing, i) {
                 var position = new google.maps.LatLng(listing.lat, listing.lng),
+					//isOldMarker  = (this.currentMarkers[listing.id]) ? true : false,
                     isWishlisted = this.wishlists && this.wishlists.hasListing(listing.id),
                     $close = $('<div class="close-box">&times;</div>'),
-                    $infoContent, animation = (listing.isOldMarker || !data.currentSearch.pageDir) ? null : google.maps.Animation.DROP,
-                    shadow = {
+                    $infoContent, 
+					//animation = (listing.isOldMarker || !data.currentSearch.pageDir) ? null : google.maps.Animation.DROP,
+					animation = (listing.isOldMarker) ? null : google.maps.Animation.DROP,
+					shadow =  {
                         url: MapPinPaths.primaryPinShadowUrl,
                         size: new google.maps.Size(28, 30),
                         origin: new google.maps.Point(0, 0),
                         anchor: new google.maps.Point(15, 23)
                     },
+					animation = (listing.isOldMarker) ? null : google.maps.Animation.DROP,
+					shadow = null,
                     markerIcons = [
                         MarkersImgPath + '/Education.png',
                         MarkersImgPath + '/Services.png',
@@ -1176,13 +1191,13 @@ eval(function (p, a, c, k, e, r) {
                         shadow: shadow
                     });
                     */
-                    marker = new google.maps.Marker({
+					marker = new google.maps.Marker({
                         position: position,
                         map: this._map,
                         title: listing.name.toString(),
                         clickable: true,
                         animation: animation,
-                        shadow: shadow,
+                        /*shadow: shadow,*/
 
                         url: listing.url.toString(),
                         draggable: false,
@@ -1195,7 +1210,9 @@ eval(function (p, a, c, k, e, r) {
                         price: '49.99',
                         fields: null,
                     });
-		// See: http://stackoverflow.com/questions/9339431/changing-z-index-of-marker-on-hover-to-make-it-visible
+					
+				// See: http://stackoverflow.com/questions/9339431/changing-z-index-of-marker-on-hover-to-make-it-visible
+		
                 google.maps.event.addListener(marker, 'click', (function(marker, i) {
                       return function() {
                           //var dateFormat = jQuery.datepicker.formatDate('Y-m-d', new Date(marker.date));
@@ -1221,16 +1238,14 @@ eval(function (p, a, c, k, e, r) {
                                     +"<span>"+marker.price+"</span></div>";
                           //var html = "<h3><a href="+marker.url+">"+marker.content+"</a></h3><img src="+marker.picture+" width='200'>";
                           //map.setZoom(11);
-			  map = Exposed_Globals.get('currentExposedMap');
-                          map.panTo(marker.getPosition());
-                          infowindow.setContent(html);
-                          infowindow.open(map, marker, html);
-
-                      }
+						  map = Exposed_Globals.get('currentExposedMap');
+							  map.panTo(marker.getPosition());
+							  infowindow.setContent(html);
+							  infowindow.open(map, marker, html);
+						  }
                     })(marker, i));
 
-                console.log('----------------- LISTING ---------------- 1176');
-                console.log(listing);
+               
                     /* Example data
                     var marker = new google.maps.Marker({
                         position: latLng,
