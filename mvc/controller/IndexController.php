@@ -41,8 +41,8 @@ class IndexController
 	*/
    public final function indexAction(array $requestDispatchData)
    {
-	   $test = \Core\Hybernate\GeoLocation\GeoLocation::getInstance($_SERVER['REMOTE_ADDR']);
-	   var_dump($test->get()); die;
+	   //$test = \Core\Hybernate\GeoLocation\GeoLocation::getInstance($_SERVER['REMOTE_ADDR']);
+	   //var_dump($test->get()); die;
 		//$this->setViewData('products', array());
    }
 }
