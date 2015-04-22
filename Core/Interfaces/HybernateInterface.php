@@ -59,6 +59,14 @@ abstract class HybernateInterface
      */
     protected $intClassRegistryId;
 
+	/**
+     * The identity binding so it can be pre processed by onBeforeGetInstance
+     *
+     * @access protected
+     * @var    mixed
+     */
+	protected static $_identityBinding;
+	
     /**
      * gets a pointer to the instance registry for instantiation
      *
@@ -132,8 +140,13 @@ abstract class HybernateInterface
     public static function getInstance($identifier = null)
     {
         $instanceRegistry = self::_getInstanceRegistry();
-        $instanceRegistry->_beforeCallback(__FUNCTION__, array($identifier));
+		$instanceRegistry->_beforeCallback(__FUNCTION__, array($identifier));
         $instanceRegistry->setId(0);
+		
+		// Small hack to allow onBeforeGetInstance to override the identifier
+		if (empty($instanceRegistry::$_identityBinding) === false) {
+			$identifier = $instanceRegistry::$_identityBinding;
+		}
 		
         if (true === is_numeric($identifier)) {
             // Load the object by ID
@@ -188,18 +201,19 @@ abstract class HybernateInterface
     /**
      * This method saves the object
      *
+     * @param  bool  $forceNewRecord (Optional) Force the save as a new record
      * @return boolean
      */
-    public function save()
+    public function save($forceNewRecord = false)
     {
         $arguments  = func_get_args();
         $this->_beforeCallback(__FUNCTION__, $arguments);
         if (false === empty($this->_changedData)) {
-            if (true === array_key_exists('id', $this->_changedData) && ((int) $this->_changedData['id'] <= 0)) {
+            if (true === array_key_exists('id', $this->_changedData) && ((int) $this->_changedData['id'] === 0)) {
                 unset ($this->_changedData['id']);
             }
-
-            $this->setId($this->_dataAccessInterface->updateRecord(strtolower($this->_objectInterfaceType), $this->_changedData, $this->getId()));
+			
+            $this->setId($this->_dataAccessInterface->updateRecord(strtolower($this->_objectInterfaceType), $this->_changedData, $this->getId(), $forceNewRecord));
             $this->_changedData = null;
         }
 
