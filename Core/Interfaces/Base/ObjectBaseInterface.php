@@ -144,6 +144,25 @@ abstract class ObjectBaseInterface
 
         return $returnData;
     }
+	
+	/**
+     * This method deletes a class variable. 
+     *
+     * @param  string $identifier The variable key
+     * @return void
+     */
+    public function deleteVariable($identifier)
+    {
+        $returnData = false;
+        $arguments  = func_get_args();
+        $this->_beforeCallback(__FUNCTION__, $arguments);
+
+        if (true === isset($this->_dataRegistry[strtolower($identifier)])) {
+            unset($this->_dataRegistry[strtolower($identifier)]);
+        }
+
+        $this->_callback(__FUNCTION__, $arguments);
+    }
 
     /**
      * This method assigns a variable

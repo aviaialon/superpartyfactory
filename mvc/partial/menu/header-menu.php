@@ -17,7 +17,7 @@
         <?php /* BEGIN NAVIGATION */ ?>
         <nav class="navigation"> 
           <a class="cs-click-menu"><i class="icon-list8"></i></a>
-          <ul>
+          <?php /*?><ul>
             <li id="menu-item-1487" class="menu-item dropdown sub-menu menu-item-type-custom dropdown sub-menu menu-item-object-custom dropdown sub-menu current-menu-item dropdown sub-menu current_page_item dropdown sub-menu menu-item-home dropdown sub-menu current-menu-ancestor dropdown sub-menu current-menu-parent dropdown sub-menu menu-item-has-children"><a href="http://directory.chimpgroup.com/">HOME</a>
               <ul class="sub-dropdown">
                 <li id="menu-item-3509" class="menu-item  menu-item-type-post_type  menu-item-object-page  current-menu-item  page_item  page-item-367  current_page_item"><a href="http://directory.chimpgroup.com/">Home 1</a></li>
@@ -96,7 +96,7 @@
               </ul>
               <!--End Sub Menu --> 
             </li>
-            <li id="menu-item-1573" class="menu-item dropdown sub-menu menu-item-type-custom dropdown sub-menu menu-item-object-custom dropdown sub-menu menu-item-has-children"><a href="http://Agents&amp;Agencies">AGENTS</a>
+            <li id="menu-item-1573" class=""><a href="http://Agents&amp;Agencies">AGENTS</a>
               <ul class="sub-dropdown">
                 <li id="menu-item-1698" class="menu-item  menu-item-type-post_type  menu-item-object-page"><a href="http://directory.chimpgroup.com/agents/">Agents</a></li>
                 <li id="menu-item-1697" class="menu-item  menu-item-type-post_type  menu-item-object-page"><a href="http://directory.chimpgroup.com/agencies/">Agencies</a></li>
@@ -107,7 +107,7 @@
               </ul>
               <!--End Sub Menu --> 
             </li>
-            <li id="menu-item-2648" class="menu-item dropdown mega-menu cs-mega-menu menu-item-type-post_type dropdown mega-menu cs-mega-menu menu-item-object-page dropdown mega-menu cs-mega-menu menu-item-has-children"><a href="http://directory.chimpgroup.com/feature-main-features/">FEATURES</a>
+            <li id="menu-item-2648" class="cs-mega-menu"><a href="http://directory.chimpgroup.com/feature-main-features/">FEATURES</a>
               <ul class="mega-grid" >
                 <li id="menu-item-2626" class="menu-item dropdown sub-menu menu-item-type-custom dropdown sub-menu menu-item-object-custom dropdown sub-menu menu-item-has-children">
                   <ul class="sub-dropdown">
@@ -167,7 +167,8 @@
               </ul>
               <!--End Sub Menu --> 
             </li>
-          </ul>
+          </ul><?php */?>
+          <?php echo \Core\Hybernate\Menu\Menu::getSiteMenuHtml($Application->translate(1, 2, 3)); ?>
         </nav>
         <?php /* END NAVIGATION */ ?>
         <?php /* POST AN ADD + ADD TO FAVS LOGIN BOX */ ?>

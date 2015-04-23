@@ -112,10 +112,10 @@ class Router
         $configs        = $Application->getConfigs();
         $rawRequestData = array_merge($_GET, $dispatchRequestData, $_POST);
 		$defaultReqUri  = str_replace('?' . $_SERVER['QUERY_STRING'], '', $_SERVER['REQUEST_URI']);
-        $mvcPath        = trim((empty($rawRequestData['path']) === false) ? $rawRequestData['path'] : $defaultReqUri, '/');
+        $mvcPath        = trim((isset($rawRequestData['path']) === true) ? $rawRequestData['path'] : $defaultReqUri, '/');
         $mvcPath        = str_replace(trim($configs->get('Application.core.server_root'), '/'), '', trim($mvcPath, '/'));
 		$mvcUrl         = $mvcPath;
-
+		
         preg_match_all ("/(?P<params>[^\/\:]*)\:(?P<values>[^\/\:]*)/", $mvcPath, $_dispatchRequestData, PREG_PATTERN_ORDER);
 
         foreach ($_dispatchRequestData['params'] as $index => $requestKey)

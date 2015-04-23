@@ -105,7 +105,10 @@ class Application
         $this->getConfigs()->set('Application.core.mvc.application_root',
                 preg_replace('/(\/[^\/.]+\/[\.]{2}\/)/', '/', preg_replace('/[\/]{2,}/', '/', $this->getConfigs()->get('Application.server.document_root') .
                 $this->getConfigs()->get('Application.core.mvc.application_path'))));
-
+		
+		// Set the available langs
+		$this->getConfigs()->set('Application.core.available.langs', explode(',', $this->getConfigs()->get('Application.core.available.langs')));
+		
         ini_set('display_errors', (int) $this->getConfigs()->get('Application.core.exception.display'));
 
         // Set the geo location

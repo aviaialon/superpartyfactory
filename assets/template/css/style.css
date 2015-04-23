@@ -263,7 +263,7 @@ address {font-style: italic;}
 	.navigation ul li ul.sub-dropdown a:before { display: none; }
 	.navigation ul li ul.sub-dropdown > li.parentIcon > a:after { content: '\eab1'; font-family:icomoon; position: absolute; right: 10px; top: 12px; color: #999; }
 	.navigation ul.mega-grid > li a:before { display: none; }
-	.navigation > ul > li > a { line-height: 80px; min-height: 80px; }
+	.navigation > ul > li > a { line-height: 80px; min-height: 80px;   text-transform: uppercase;}
 	.navigation ul li:first-child a { padding-left: 0px; }
 /* Sub Menu Css */
 .sub-dropdown { -moz-transform: translateX(20px); -moz-transition: all 0.3s ease-in; -ms-transform: translateX(20px); -ms-transition: all 0.3s ease-in; -o-transform: translateX(20px); -o-transition: all 0.3s ease-in; -webkit-transform: translateX(20px); -webkit-transition: all 0.3s ease-in; background-color: #ffffff; box-shadow: -1px -1px 5px 0 rgba(0, 0, 0, 0.1),-1px 8px 8px 0 rgba(0, 0, 0, 0.1); left: 0px; margin: 0px; opacity: 0; position: absolute; top: 100%; transform: translateX(20px); transition: all 0.3s ease-in; visibility: hidden; width: 199px; z-index: 99; }
