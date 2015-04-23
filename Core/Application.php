@@ -69,9 +69,9 @@ class Application
      */
     public static final function loadErrorHandler()
     {
-		error_reporting(E_ALL);
-		set_error_handler(array('\\Core\\Exception\\Exception', 'mvcApplicationError'));
-		set_exception_handler(array('\\Core\\Exception\\Exception', 'mvcApplicationError'));
+        error_reporting(E_ALL);
+        set_error_handler(array('\\Core\\Exception\\Exception', 'mvcApplicationError'));
+        set_exception_handler(array('\\Core\\Exception\\Exception', 'mvcApplicationError'));
     }
 
     /**
@@ -85,7 +85,7 @@ class Application
     protected final function bootstrap(array $configs)
     {
         @session_start();
-		
+
         if (false === \Core\Application::$_disableAutoload) {
             spl_autoload_register(array($this, 'autoload'));
         }
@@ -105,8 +105,11 @@ class Application
         $this->getConfigs()->set('Application.core.mvc.application_root',
                 preg_replace('/(\/[^\/.]+\/[\.]{2}\/)/', '/', preg_replace('/[\/]{2,}/', '/', $this->getConfigs()->get('Application.server.document_root') .
                 $this->getConfigs()->get('Application.core.mvc.application_path'))));
-				
+
         ini_set('display_errors', (int) $this->getConfigs()->get('Application.core.exception.display'));
+
+        // Set the geo location
+        $this->setGeoLocation(\Core\Hybernate\GeoLocation\GeoLocation::getInstance($_SERVER['REMOTE_ADDR']));
 
         return $this;
     }

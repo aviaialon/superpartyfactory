@@ -15,7 +15,8 @@
       </aside>
       <aside class="right-side">
         <?php /* BEGIN NAVIGATION */ ?>
-        <nav class="navigation"> <!--<a class="cs-click-menu"><i class="icon-list8"></i></a>-->
+        <nav class="navigation"> 
+          <a class="cs-click-menu"><i class="icon-list8"></i></a>
           <ul>
             <li id="menu-item-1487" class="menu-item dropdown sub-menu menu-item-type-custom dropdown sub-menu menu-item-object-custom dropdown sub-menu current-menu-item dropdown sub-menu current_page_item dropdown sub-menu menu-item-home dropdown sub-menu current-menu-ancestor dropdown sub-menu current-menu-parent dropdown sub-menu menu-item-has-children"><a href="http://directory.chimpgroup.com/">HOME</a>
               <ul class="sub-dropdown">
