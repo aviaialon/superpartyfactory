@@ -140,14 +140,17 @@ abstract class HybernateInterface
     public static function getInstance($identifier = null)
     {
         $instanceRegistry = self::_getInstanceRegistry();
+		$instanceRegistry::$_identityBinding = false;
+		
         $instanceRegistry->_beforeCallback(__FUNCTION__, array($identifier));
         $instanceRegistry->setId(0);
 
         // Small hack to allow onBeforeGetInstance to override the identifier
         if (empty($instanceRegistry::$_identityBinding) === false) {
             $identifier = $instanceRegistry::$_identityBinding;
+			$instanceRegistry::$_identityBinding = false;
         }
-
+		
         if (true === is_numeric($identifier)) {
             // Load the object by ID
             $identityBinding = array('id' => (int) $identifier);

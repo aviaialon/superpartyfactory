@@ -1078,6 +1078,26 @@ class Url {
 		return ($strReturnUrl);	
 	}
 	
+	/**
+    * Parses text and returns it in url friendly format
+    *
+    * @param  string  $strText The text to format
+    * @return string
+    */
+	public static function makeUrlFriendlytext($strText = null)
+	{
+		$search  = explode(",","ç,æ,œ,á,é,í,ó,ú,à,è,ì,ò,ù,ä,ë,ï,ö,ü,ÿ,â,ê,î,ô,û,å,e,i,ø,u");
+		$replace = explode(",","c,ae,oe,a,e,i,o,u,a,e,i,o,u,a,e,i,o,u,y,a,e,i,o,u,a,e,i,o,u");
+		$strText = str_replace($search, $replace, $strText);
+		//$strTitle = iconv('UTF-8','ASCII//TRANSLIT', $strTitle);
+		
+		$strText = preg_replace('/[^A-Za-z0-9 ]/', ' ', ucwords($strText));
+		$strText = preg_replace('/[\s]{1,}/', ' ', ucwords($strText));
+		$strText = preg_replace('/[\s]/', '-', $strText);	
+		
+		return $strText;
+	}
+	
    /**
     * Parses a route and adds its values
 	* Example: /test/url/param1:value

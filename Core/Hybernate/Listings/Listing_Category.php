@@ -36,6 +36,18 @@ class Listing_Category extends \Core\Interfaces\HybernateInterface
     }
 	
 	/**
+     * This method is called before save of a category
+     *
+     * @return void
+     */
+    public final function onBeforeSave()
+    {
+        if ($this->getName_En() !== false) {
+			$this->setUrlKey(\Core\Net\Url::makeUrlFriendlytext($this->getName_En()));
+        }
+    }
+	
+	/**
      * This method returns the translated name
      *
      * @return void

@@ -11,7 +11,7 @@
  *
  * copyright (c) Avi Aialon (DeviantLogic)
  * This source file is subject to the BSD/GPLv2 License that is bundled
- * with this source code in the file license.txt. 
+ * with this source code in the file license.txt.
  */
 namespace Core\Hybernate\Menu;
 /**
@@ -26,178 +26,229 @@ namespace Core\Hybernate\Menu;
  *
  * copyright (c) Avi Aialon (DeviantLogic)
  * This source file is subject to the BSD/GPLv2 License that is bundled
- * with this source code in the file license.txt. 
+ * with this source code in the file license.txt.
  */
 class Menu extends \Core\Interfaces\HybernateInterface
 {
-	/**
-	 * This method loads the menu  
-	 * @param Integer $intMenuGroupId The Menu Group Id 
-	 * @param String  $strAttribute An extra attribute to add the main <UL> menu. 
-	 * 								Ex: attr = 'id="test"' will generate <ul id="test">...</ul>
-	 * @param String  $strCurrentCononicalUrl The current canonical URL (used to find the active menu item)
-	 * @return String $strMenuHtml The menu HTML
-	 */
-	public static final function getSiteMenuHtml($intMenuGroupId, $strAttribute = '', $strCanonicalUrl = NULL, $blnAddMenuArrow = true)
-	{
-		$Application            = \Core\Application::getInstance();
-		$objMenuTree            = Menu_Tree::getInstance();
-		$strCurrentCanonicalUrl = ((false === is_null($strCanonicalUrl)) ? $strCanonicalUrl : 
-			\Core\Net\Url::getCanonicalUrl(NULL, false, true, true, array(session_name()), false)
-		);
-		$strCurrentCanonicalUrl = ((true === empty($strCurrentCanonicalUrl)) ? '/' : $strCurrentCanonicalUrl);
-		$strMenuHtml	        = null;
-		$arrPageMenu	        = array();
-		
-		if (
-			(false === empty($strCurrentCanonicalUrl)) &&
-			(true === (in_array(substr($strCurrentCanonicalUrl, 0, 3), array('/en', '/fr', '/ch'))))
-		) {
-			$strCurrentCanonicalUrl = '/' . (substr($strCurrentCanonicalUrl, 3));
-			$strCurrentCanonicalUrl = str_replace('//', '/', $strCurrentCanonicalUrl);
-		}
-		
-		$arrPageMenu = \Core\Hybernate\Menu\Menu::getObjectClassView(array(
-			'cacheQuery'=> 	false,	
-			'filter' 	=>	array(
-				'group_id' 	=> (int) $intMenuGroupId
-			),
-			'orderBy'	=> 'parent_id ASC, position',
-			'direction'	=> 'ASC'
-		));
-		
-		if (false === empty($arrPageMenu))
-		{
-			$arrParents = array();
-			foreach ($arrPageMenu as $arrRow) 
-			{
-				if (false === empty($arrRow['parent_id']) && (int) $arrRow['parent_id'] > 0) {
-					$arrParents[(int) $arrRow['parent_id']] = true;
-				}
-			}
-			
-			reset ($arrRow);
-			foreach ($arrPageMenu as $arrRow) 
-			{
-				$blnIsCurrentPage 	= false;
-				$blnUsedCurrent 	= false;
-				if (false === empty($strCurrentCanonicalUrl))
-				{
-					$strMenuUrl = $arrRow['url'];
-					$strMenuUrl = str_replace($Application->getConfigs()->get('Application.core.base_url'), '/', $strMenuUrl);
-					$strMenuUrl = str_replace('//', '/', $strMenuUrl);
-					$blnIsCurrentPage = $blnUsedCurrent = (bool) ($strCurrentCanonicalUrl == ($strMenuUrl));	
-				}
-				
-				$label  = '<a href="'. $arrRow['url'] .'" ' . ($blnIsCurrentPage ? ' class="current active" ' : '') . '>';
-				$label .= $arrRow['title'];
-				/*
-				if (
-					(true === $blnAddMenuArrow) &&
-					(true  === array_key_exists((int) $arrRow['id'], $arrParents)) &&
-					(false === empty($arrRow['parent_id'])) // Make sure its not the first row!
-				) {
-					$label .= '<img src="/static/images/right.png" class="menuArrow" />';
-				}
-				*/
-				
-				$label .= '</a>';
-				$li_attr = ' class="';
-				if ($arrRow['class']) 
-				{
-					$li_attr .= $arrRow['class'] . " ";
-				}
-				$li_attr .= ($blnIsCurrentPage ? 'current active' : '') . '"';
-				$objMenuTree->add_row($arrRow['id'], $arrRow['parent_id'], $li_attr, $label);
-			}
-			
-			$strMenuHtml = $objMenuTree->generate_list($strAttribute);
-		}
-	
-		
-		return ($strMenuHtml);
-	}
-	
-	/**
-	 * This method updates the position of a certain menu. its a recursive function.
-	 * 
-	 * @access	public, static
-	 * @param 	integer 	$intParentId 		- The menu parent ID
-	 * @param 	array 		$arrMenuChildren 	- The menu children
-	 * @param 	integer		$intMenuGroupId 	- The menu groupId (used to clear the cache)
-	 * @return 	void
-	 */
-	public static function updateMenuPosition($intParentId = 0, $arrMenuChildren = array(), $intMenuGroupId = false) 
-	{
-		$i = 1;
-		foreach ($arrMenuChildren as $k => $v) 
-		{	
-			/**
-			 * Using iQuery here greatly improves the performance!
-			 */
-			$intId = (int) $arrMenuChildren[$k]['id'];
-			\Core\Application::getInstance()->getDatabase()->execute(
-				"UPDATE " . strtolower(__CLASS__) . " " .
-				"SET	parent_id = " . (int) $intParentId . ", " .
-				"		position = " . (int) $i . " " .
-				"WHERE	id = " . $intId	
-			);
-			
-			if (isset($arrMenuChildren[$k]['children'][0])) 
-			{
-				self::updateMenuPosition($intId, $arrMenuChildren[$k]['children']);
-			}
-			$i++;
-		}
-	}
-	
-	
-	
-	/**
-	 * This method loads the menu  
-	 * @param Integer 	$intMenuGroupId	- 	The Menu Group Id 
-	 * @param String 	$strAttribute 	- 	An extra attribute to add the main <UL> menu. 
-	 * 										Ex: attr = 'id="test"' will generate <ul id="test">...</ul>
-	 * @return Array	$arrPageMenuTree	- 	The menu Tree
-	 */
-	public static final function getRawMenuData($intMenuGroupId, $strAttribute = '')
-	{
-		$objMenuTree	 = Menu_Tree::getInstance();
-		$arrPageMenu	 = array();
-		$arrPageMenuTree = array();
-		$objSortedMenu	 = new stdClass();
+    /**
+     * This method loads the menu
+     * @param Integer $intMenuGroupId The Menu Group Id
+     * @param String  $strAttribute An extra attribute to add the main <UL> menu.
+     *                                 Ex: attr = 'id="test"' will generate <ul id="test">...</ul>
+     * @param String  $strCurrentCononicalUrl The current canonical URL (used to find the active menu item)
+     * @return String $strMenuHtml The menu HTML
+     */
+    public static final function getSiteMenuHtml($intMenuGroupId, $strAttribute = '', $strCanonicalUrl = NULL, $blnAddMenuArrow = true)
+    {
+        $Application            = \Core\Application::getInstance();
+        $objMenuTree            = Menu_Tree::getInstance();
+        $strCurrentCanonicalUrl = ((false === is_null($strCanonicalUrl)) ? $strCanonicalUrl :
+            \Core\Net\Url::getCanonicalUrl(NULL, false, true, true, array(session_name()), false)
+        );
+        $strCurrentCanonicalUrl = ((true === empty($strCurrentCanonicalUrl)) ? '/' : $strCurrentCanonicalUrl);
+        $strMenuHtml            = null;
+        $arrPageMenu            = array();
 
-		$arrPageMenu = \Core\Hybernate\Menu\Menu::getObjectClassView(array(
-			'cacheQuery'=> 	false,	
-			'filter' 	=>	array(
-				'group_id' 	=> (int) $intMenuGroupId
-			),
-			'orderBy'	=> 'parent_id ASC, position',
-			'direction'	=> 'ASC'
-		));
+        if (
+            (false === empty($strCurrentCanonicalUrl)) &&
+            (true === (in_array(substr($strCurrentCanonicalUrl, 0, 3), array('/en', '/fr', '/ch'))))
+        ) {
+            $strCurrentCanonicalUrl = '/' . (substr($strCurrentCanonicalUrl, 3));
+            $strCurrentCanonicalUrl = str_replace('//', '/', $strCurrentCanonicalUrl);
+        }
+
+        $arrPageMenu = \Core\Hybernate\Menu\Menu::getObjectClassView(array(
+            'cacheQuery'=>     false,
+            'filter'     =>    array(
+                'group_id'     => (int) $intMenuGroupId
+            ),
+            'orderBy'    => 'parent_id ASC, position',
+            'direction'    => 'ASC'
+        ));
 		
-		if (FALSE === empty($arrPageMenu))
-		{
-			foreach ($arrPageMenu as $arrRow) 
-			{
-				$li_attr = array();
-				if (false === empty($arrRow['class'])) {
-					$li_attr['class'] = $arrRow['class'];
-				}
-				
-				$objMenuTree->add_row($arrRow['id'], $arrRow['parent_id'], $li_attr, $arrRow['title'], $arrRow['url']);
+		// Add the categories to the menu tree
+		$arrPageMenu = \Core\Hybernate\Menu\Menu::_addCategoriesMenu($arrPageMenu);
+		
+        if (false === empty($arrPageMenu))
+        {
+            $arrParents = array();
+            foreach ($arrPageMenu as $arrRow)
+            {
+                if (false === empty($arrRow['parent_id']) && (int) $arrRow['parent_id'] > 0) {
+                    $arrParents[(int) $arrRow['parent_id']] = true;
+                }
+            }
+
+            reset ($arrRow);
+            foreach ($arrPageMenu as $arrRow)
+            {
+                $blnIsCurrentPage   = false;
+                $blnUsedCurrent     = false;
+                if (false === empty($strCurrentCanonicalUrl))
+                {
+                    $strMenuUrl = $arrRow['url'];
+                    $strMenuUrl = str_replace($Application->getConfigs()->get('Application.core.base_url'), '/', $strMenuUrl);
+                    $strMenuUrl = str_replace('//', '/', $strMenuUrl);
+                    $blnIsCurrentPage = $blnUsedCurrent = (bool) ($strCurrentCanonicalUrl == ($strMenuUrl));
+                }
+
+                $label  = '<a href="'. $arrRow['url'] .'" ' . ($blnIsCurrentPage ? ' class="current active" ' : '') . '>';
+                $label .= $arrRow['title'];
+                /*
+                if (
+                    (true === $blnAddMenuArrow) &&
+                    (true  === array_key_exists((int) $arrRow['id'], $arrParents)) &&
+                    (false === empty($arrRow['parent_id'])) // Make sure its not the first row!
+                ) {
+                    $label .= '<img src="/static/images/right.png" class="menuArrow" />';
+                }
+                */
+
+                $label .= '</a>';
+                $li_attr = ' class="';
+                if ($arrRow['class'])
+                {
+                    $li_attr .= $arrRow['class'] . " ";
+                }
+                $li_attr .= ($blnIsCurrentPage ? 'current active' : '') . '"';
+                $objMenuTree->add_row($arrRow['id'], $arrRow['parent_id'], $li_attr, $label);
+            }
+
+            $strMenuHtml = $objMenuTree->generate_list($strAttribute);
+        }
+
+        return ($strMenuHtml);
+    }
+
+	/**
+     * This method injects the categories in the menu tree
+     * 
+     * @access protected statis
+     * @return void
+     */
+    protected static function _addCategoriesMenu(array $currentMenu)
+    {
+		if (empty($currentMenu) === false) {
+			$Application  = \Core\Application::getInstance();
+			$firstElement = array_shift($currentMenu);
+	
+			foreach (\Core\Hybernate\Listings\Listing_Category::getObjectClassView(array('columns' => array(
+				'a.id as intId',
+				'a.urlKey as urlKey',
+				'CONCAT("99999", a.id) as id',
+				'IF(a.parentId = 0, "cat_menu", CONCAT("99999", a.parentId)) as parent_id',
+				sprintf('a.name_%s as title', $Application->translate('en', 'fr', 'ch')),
+				sprintf('a.description_%s as description', $Application->translate('en', 'fr', 'ch'))		
+			), 'orderBy' => sprintf('a.orderIndex', $Application->translate('en', 'fr', 'ch')))) as $category) {
+
+				array_unshift($currentMenu, array_merge(
+					$category,
+					array(
+						'url' 	=> $Application->getRequestDispatcher()->route('category', strtolower($category['urlKey']), array()),
+						'class'	=> '',
+						'isCat' => true
+					)
+				));
 			}
 			
-			$arrPageMenuTree = $objMenuTree->generate_raw_list(0, $strAttribute);
+			array_unshift($currentMenu, array(
+				'id' 		=> 'cat_menu',
+				'class' 	=> '',
+				'parent_id'	=> 0,
+				'title' 	=> 'Categories',
+				'url' 		=> null,
+				'isCat' => true
+			));
 			
-			$objMemcache->set($strMenuCacheKey, $arrPageMenuTree, strtotime('+30 minute'));
+			
+			// Re-instate the first array element
+			array_unshift($currentMenu, $firstElement);
 		}
 		
-		
-	
-		
-		return ($arrPageMenuTree);
+		//\Core\Debug\Dump::getInstance($currentMenu); die;
+		return $currentMenu;
 	}
+	
+    /**
+     * This method updates the position of a certain menu. its a recursive function.
+     *
+     * @access    public, static
+     * @param     integer     $intParentId         - The menu parent ID
+     * @param     array         $arrMenuChildren     - The menu children
+     * @param     integer        $intMenuGroupId     - The menu groupId (used to clear the cache)
+     * @return     void
+     */
+    public static function updateMenuPosition($intParentId = 0, $arrMenuChildren = array(), $intMenuGroupId = false)
+    {
+        $i = 1;
+        foreach ($arrMenuChildren as $k => $v)
+        {
+            /**
+             * Using iQuery here greatly improves the performance!
+             */
+            $intId = (int) $arrMenuChildren[$k]['id'];
+            \Core\Application::getInstance()->getDatabase()->execute(
+                "UPDATE " . strtolower(__CLASS__) . " " .
+                "SET    parent_id = " . (int) $intParentId . ", " .
+                "        position = " . (int) $i . " " .
+                "WHERE    id = " . $intId
+            );
+
+            if (isset($arrMenuChildren[$k]['children'][0]))
+            {
+                self::updateMenuPosition($intId, $arrMenuChildren[$k]['children']);
+            }
+            $i++;
+        }
+    }
+
+
+
+    /**
+     * This method loads the menu
+     * @param Integer     $intMenuGroupId    -     The Menu Group Id
+     * @param String     $strAttribute     -     An extra attribute to add the main <UL> menu.
+     *                                         Ex: attr = 'id="test"' will generate <ul id="test">...</ul>
+     * @return Array    $arrPageMenuTree    -     The menu Tree
+     */
+    public static final function getRawMenuData($intMenuGroupId, $strAttribute = '')
+    {
+        $objMenuTree     = Menu_Tree::getInstance();
+        $arrPageMenu     = array();
+        $arrPageMenuTree = array();
+        $objSortedMenu     = new stdClass();
+
+        $arrPageMenu = \Core\Hybernate\Menu\Menu::getObjectClassView(array(
+            'cacheQuery'=>     false,
+            'filter'     =>    array(
+                'group_id'     => (int) $intMenuGroupId
+            ),
+            'orderBy'    => 'parent_id ASC, position',
+            'direction'    => 'ASC'
+        ));
+
+        if (FALSE === empty($arrPageMenu))
+        {
+            foreach ($arrPageMenu as $arrRow)
+            {
+                $li_attr = array();
+                if (false === empty($arrRow['class'])) {
+                    $li_attr['class'] = $arrRow['class'];
+                }
+
+                $objMenuTree->add_row($arrRow['id'], $arrRow['parent_id'], $li_attr, $arrRow['title'], $arrRow['url']);
+            }
+
+            $arrPageMenuTree = $objMenuTree->generate_raw_list(0, $strAttribute);
+
+            $objMemcache->set($strMenuCacheKey, $arrPageMenuTree, strtotime('+30 minute'));
+        }
+
+
+
+
+        return ($arrPageMenuTree);
+    }
 }
 
 
@@ -215,142 +266,150 @@ class Menu extends \Core\Interfaces\HybernateInterface
  *
  * output:4
  * <ul>
- * 	<li>Menu 1
- * 		<ul>
- * 			<li>Menu 1.1</li>
- * 			<li>Menu 1.2</li>
- * 		</ul>
- * 	</li>
- * 	<li>Menu 2</li>
+ *     <li>Menu 1
+ *         <ul>
+ *             <li>Menu 1.1</li>
+ *             <li>Menu 1.2</li>
+ *         </ul>
+ *     </li>
+ *     <li>Menu 2</li>
  * </ul>l..[''[0o;.0
  *
  * @author gawibowo
  */
-class Menu_Tree 
+class Menu_Tree
 {
-	
-	/**
-	 * variable to store temporary data to be processed later
-	 *
-	 * @var array
-	 */
-	var $data;
-	
-	public static final function getInstance()
-	{
-		return (new self());
-	}
-	
-	/**
-	 * Add an item
-	 *
-	 * @param int $id 			ID of the item
-	 * @param int $parent 		parent ID of the item
-	 * @param string $li_attr 	attributes for <li>
-	 * @param string $label		text inside <li></li>
-	 */
-	function add_row($id=NULL, $parent=NULL, $li_attr=NULL, $label=NULL, $url=NULL) 
-	{
-		$this->data [$parent] [] = array ('id' => $id, 'li_attr' => $li_attr, 'label' => $label, 'url' => $url );
-	}
-	
-	/**
-	 * Generates nested lists
-	 *
-	 * @param string $ul_attr
-	 * @return string
-	 */
-	function generate_list($ul_attr = '') 
-	{
-		return $this->ul ( 0, $ul_attr );
-	}
 
-	/**
-	 * Generates nested lists and returns the raw array
-	 *
-	 * @param integer $parentId - For recursive purposes
-	 * @return array
-	 */
-	function generate_raw_list($parent=0) 
-	{
-		static $i = 1;
-		static $level = 0;
-		if (isset ( $this->data [$parent] )) {
-			if ($strAttribute) {
-				$strAttribute = ' ' . $strAttribute;
-			}
-			$menuArray = array();
-			$i ++;
-			$level++;
-			foreach ( $this->data [$parent] as $row ) {
-				$child = $this->generate_raw_list ( $row ['id'] );
-				$menuArray[] = array(
-					'attributes' => $row ['li_attr'],
-					'label'		 => $row ['label'],
-					'url'		 => $row ['url'],
-					'children'	 => $child,
-					'menu_level' => $level	
-				);
-				
-				if ($child) { $i --; }
-			}
-			$level--;
+    /**
+     * variable to store temporary data to be processed later
+     *
+     * @var array
+     */
+    var $data;
+
+    public static final function getInstance()
+    {
+        return (new self());
+    }
+
+    /**
+     * Add an item
+     *
+     * @param int $id             ID of the item
+     * @param int $parent         parent ID of the item
+     * @param string $li_attr     attributes for <li>
+     * @param string $label        text inside <li></li>
+     */
+    function add_row($id=NULL, $parent=NULL, $li_attr=NULL, $label=NULL, $url=NULL)
+    {
+        $this->data [$parent] [] = array ('id' => $id, 'li_attr' => $li_attr, 'label' => $label, 'url' => $url );
+    }
+
+    /**
+     * Generates nested lists
+     *
+     * @param string $ul_attr
+     * @return string
+     */
+    function generate_list($ul_attr = '')
+    {
+        return $this->ul ( 0, $ul_attr );
+    }
+
+    /**
+     * Generates nested lists and returns the raw array
+     *
+     * @param integer $parentId - For recursive purposes
+     * @return array
+     */
+    function generate_raw_list($parent=0)
+    {
+        static $i = 1;
+        static $level = 0;
+        if (isset ( $this->data [$parent] )) {
+            if ($strAttribute) {
+                $strAttribute = ' ' . $strAttribute;
+            }
+            $menuArray = array();
+            $i ++;
+            $level++;
+            foreach ( $this->data [$parent] as $row ) {
+                $child = $this->generate_raw_list ( $row ['id'] );
+                $menuArray[] = array(
+                    'attributes' => $row ['li_attr'],
+                    'label'         => $row ['label'],
+                    'url'         => $row ['url'],
+                    'children'     => $child,
+                    'menu_level' => $level
+                );
+
+                if ($child) { $i --; }
+            }
+            $level--;
+
+            return $menuArray;
+        }
+        else
+        {
+            return array();
+        }
+    }
+
+    /**
+     * Recursive method for generating nested lists
+     *
+     * @param int $parent
+     * @param string $strAttribute
+     * @return string
+     */
+    function ul($parent = 0, $strAttribute = '')
+    {
+        static $i = 1;
+        $indent = str_repeat ( "\t\t", $i );
+        if (isset ( $this->data [$parent] )) {
+            if ($i > 1)
+                $strAttribute .= 'class="sub-dropdown"';
+
+            if ($strAttribute) {
+                $strAttribute = ' ' . $strAttribute;
+            }
 			
-			return $menuArray;
-		} 
-		else 
-		{
-			return array();
-		}
-	}
-	
-	/**
-	 * Recursive method for generating nested lists
-	 *
-	 * @param int $parent
-	 * @param string $strAttribute
-	 * @return string
-	 */
-	function ul($parent = 0, $strAttribute = '') 
-	{
-		static $i = 1;
-		$indent = str_repeat ( "\t\t", $i );
-		if (isset ( $this->data [$parent] )) {
-			if ($i > 1)
-				$strAttribute .= 'class="sub-dropdown"';
-				
-			if ($strAttribute) {
-				$strAttribute = ' ' . $strAttribute;
-			}
-			$html = "\n$indent";
-			$html .= "<ul$strAttribute>";
-			$i ++;
-			foreach ( $this->data [$parent] as $row ) {
-				$child = $this->ul ( $row ['id'] );
-				$html .= "\n\t$indent";
-				$html .= '<li' . $row ['li_attr'] . '>';
-				$html .= $row ['label'];
-				
-				if ($child) {
-					$i --;
-					$html .= $child;
-					$html .= "\n\t$indent";
-				}
-				$html .= '</li>';
-			}
-			$html .= "\n$indent</ul>";
-			return $html;
-		} else {
-			return false;
-		}
-	}
-	
-	/**
-	 * Clear the temporary data
-	 *
-	 */
-	function clear() 
-	{
-		$this->data = array ();
-	}
+			/*
+			var_dump($this->data[$parent]); die;
+			if (true === isset($this->data[$parent]['isCat'])) {
+				$strAttribute = ' class="mega-grid"';
+				die('ok');
+			}*/
+			
+            $html = "\n$indent";
+            $html .= "<ul$strAttribute>";
+            $i ++;
+            foreach ( $this->data [$parent] as $row ) {
+                $child = $this->ul ( $row ['id'] );
+                $html .= "\n\t$indent";
+                $html .= '<li' . $row ['li_attr'] . '>';
+                $html .= $row ['label'];
+
+                if ($child) {
+                    $i --;
+                    $html .= $child;
+                    $html .= "\n\t$indent";
+                }
+                $html .= '</li>';
+            }
+            $html .= "\n$indent</ul>";
+            return $html;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Clear the temporary data
+     *
+     */
+    function clear()
+    {
+        $this->data = array ();
+    }
 }
